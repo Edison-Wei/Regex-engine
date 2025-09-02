@@ -1,14 +1,33 @@
-#if !defined(utils)
-#define utils
+#if !defined(UTILS)
+#define UTILS
 
 #define EMPTY 0
 #define GOAL 1
 typedef struct Graph Graph;
 typedef struct Node Node;
 
+struct Node{
+    int character;
+    Node *left; // output
+    Node *right; //output2
+    // int lastlist; Maybe
 
-Node* node();
-Node *add_goal_nodes();
+};
+
+struct Graph{
+    Node *nodes;
+    int length_of_nodes; // Counts number of nodes excluding goal node
+
+    void (*free_nodes)(Graph *);
+    void (*add_node_left)(Graph *, int character);
+    void (*add_node_right)(Graph *, int character);
+    void (*loop_to_start)(Graph *);
+    void (*loop_node)(Graph *);
+};
+
+
+Node *node();
+Node *add_goal_node();
 
 Graph *graph();
 void add_node_left(Graph *self, int character);
@@ -18,4 +37,4 @@ void free_nodes(Graph *self);
 void loop_to_start(Graph *self);
 void loop_node(Graph *self);
 
-#endif // utils
+#endif // UTILS

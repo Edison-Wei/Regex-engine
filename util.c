@@ -2,25 +2,6 @@
 #include <stdlib.h>
 #include "util.h"
 
-struct Node{
-    int character;
-    struct Node *left; // output
-    struct Node *right; //output2
-    // int lastlist; Maybe
-
-};
-
-struct Graph{
-    Node *nodes;
-    int length_of_nodes; // Counts number of nodes excluding goal node
-
-    void (*free_nodes)(Graph *);
-    void (*add_node_left)(Graph *, int character);
-    void (*add_node_right)(Graph *, int character);
-    void (*loop_to_start)(Graph *);
-    void (*loop_node)(Graph *);
-};
-
 // Node constructor
 Node* node() {
     Node *new_node = malloc(sizeof(Node));
@@ -31,18 +12,22 @@ Node* node() {
     return new_node;
 }
 
-Node *add_goal_nodes() {
-    Node *head_node = node();
-    Node *left_goal_node = node();
-    Node *right_goal_node = node();
+Node *add_goal_node() {
+    Node *goal_node = node();
+    goal_node->character = GOAL;
+    return goal_node;
 
-    left_goal_node->character = GOAL;
-    right_goal_node->character = GOAL;
+    // Node *head_node = node();
+    // Node *left_goal_node = node();
+    // Node *right_goal_node = node();
+
+    // left_goal_node->character = GOAL;
+    // right_goal_node->character = GOAL;
     
-    head_node->left = left_goal_node;
-    head_node->right = right_goal_node;
+    // head_node->left = left_goal_node;
+    // head_node->right = right_goal_node;
 
-    return head_node;
+    return goal_node;
 }
 
 Graph *graph() {
@@ -55,6 +40,7 @@ Graph *graph() {
     graph->free_nodes = free_nodes;
     graph->loop_to_start = loop_to_start;
     graph->loop_node = loop_node;
+    return graph;
 }
 
 void add_node_left(Graph *self, int character) {
@@ -63,13 +49,21 @@ void add_node_left(Graph *self, int character) {
     new_node->character = character;
 
     if (curr_node == NULL) {
-        self->nodes = add_goal_nodes();
+        Node *head_node = node();
+        head_node->left = new_node;
+        new_node->left = add_goal_node();
 
-        new_node->left = curr_node->left;
-        curr_node->left = new_node;
+        self->nodes = head_node;
+        // self->nodes = add_goal_node();
+
+        // new_node->left = self->nodes->left;
+        // self->nodes->left = new_node;
 
         self->length_of_nodes = 1;
         return;
+    }
+    if (curr_node->left == NULL) {
+        curr_node->left = add_goal_node();
     }
 
     while (curr_node->left->character != GOAL) {
@@ -86,14 +80,24 @@ void add_node_right(Graph *self, int character) {
     Node *new_node = node();
     new_node->character = character;
 
-    if (curr_node == NULL) {
-        self->nodes = add_goal_nodes();
+    if (curr_node == NULL) {        
+        Node *head_node = node();
+        head_node->left = new_node;
+        new_node->left = add_goal_node();
 
-        new_node->right = curr_node->right;
-        curr_node->right = new_node;
+        self->nodes = head_node;
+
+
+        // self->nodes = add_goal_node();
+
+        // new_node->right = self->nodes->right;
+        // self->nodes->right = new_node;
         
         self->length_of_nodes = 1;
         return;
+    }
+    if (curr_node->right == NULL) {
+        curr_node->right = add_goal_node();
     }
 
     while (curr_node->right->character != GOAL) {
@@ -118,10 +122,9 @@ void free_node_repeat(Node *node) {
     return;
 }
 
-// Fix recursive free
 void free_nodes(Graph *self) {
     if (self == NULL)
-        return NULL;
+        return;
 
     free_node_repeat(self->nodes->left);
     free_node_repeat(self->nodes->right);
@@ -130,7 +133,7 @@ void free_nodes(Graph *self) {
     self->nodes = NULL;
     self->length_of_nodes = 0;
 
-    return self;
+    return;
 }
 
 void loop_to_start(Graph *self) {

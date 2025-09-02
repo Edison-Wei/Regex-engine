@@ -1,14 +1,16 @@
-#if !defined(Parser)
-#define Parser
+#if !defined(PARSER)
+#define PARSER
+#include "util.h"
 
 #define MAX_ARRAY_LENGTH 8
 
-#define void parser_regex(char *regex);
-#define void split(Graph *parser, char *regex);
+Graph* parse_regex(char *regex);
+void split(Graph *parser, char *regex);
+void deconstruct(Graph *parser);
 
 // Not used, will need to change goal Node approach
-#define void zero_or_none(Graph *parser, char *regex);
-#define void zero_or_more(Graph *parser, char *regex);
-#define void one_or_more(Graph *parser, char *regex);
+void zero_or_none(Graph *parser, char *regex);
+void zero_or_more(Graph *parser, char *regex);
+void one_or_more(Graph *parser, char *regex);
 
-#endif // Parser
+#endif // PARSER

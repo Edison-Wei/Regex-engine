@@ -4,40 +4,39 @@
 
 /// @brief Given a regular expression. Translate the expression into a readable form. (ex. [a-zA-Z]@gmail.com = heLLo@gmail.com)
 /// @param regex an array of char (a string) containing the regular expression to be decoded
-Graph* parse_regex(char *regex) {
+Graph* parse_regex(Graph *parser, char *regex) {
     if (!regex) {
         return NULL;
     }
     
-
-    Graph *parser = graph(); // can be 16 if needed 
-    // for (int i = 0; i < MAX_ARRAY_LENGTH; i++) {
-    //     parser[i] = graph();
-    // }
+    if (!parser) {
+        parser = graph(); // can be 16 if needed 
+    }
     char character;
-    // int num_capture_groups = 0;
 
     do {
         character = regex[0];
 
-        // if (character == '\n') continue;
-
         if (character == '.') {
-            regex++;
+            ++regex;
             continue;
         }
         else if (character == '|') {
-            split(parser, regex++);
+            int regex_index = split(parser, ++regex);
+            regex += regex_index;
+
         }
         else if (character == '?') {
-            // zero_or_none(parser, regex++);
+            // zero_or_none(parser, ++regex);
+            alternative_path(parser);
         }
         else if (character == '*') {
-            // zero_or_more(parser, regex++);
+            // zero_or_more(parser, ++regex);
             loop_to_start(parser);
+            add_node_right(parser, (int)character);
         }
         else if (character == '+') {
-            // one_or_more(parser, regex++);
+            // one_or_more(parser, ++regex);
             loop_node(parser);
         }
         else {
@@ -49,24 +48,27 @@ Graph* parse_regex(char *regex) {
 
         // }
 
-        regex++;
+        ++regex;
     } while (regex[0] != '\0');
 
     // Create goal nodes when completed parsers
     return parser;
 }
 
-void split(Graph *parser, char *regex) {
+int split(Graph *parser, char *regex) {
     char character;
+    int regex_index = -1; // Since '|' is already removed
+
     while (regex[0] != '\0') {
         character = regex[0];
         if (character == ']' || character == ')') {
             break;
         }
         add_node_right(parser, (int)character);
-        regex++;
+        ++regex;
+        ++regex_index;
     }
-    return;
+    return regex_index;
 }
 
 void deconstruct(Graph *parser) {
@@ -74,7 +76,5 @@ void deconstruct(Graph *parser) {
     //     free_nodes(&parser[i]);
     // }
     free_nodes(parser);
-
-    free(parser);
     return;
 }

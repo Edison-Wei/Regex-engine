@@ -82,8 +82,8 @@ void add_node_right(Graph *self, int character) {
 
     if (curr_node == NULL) {        
         Node *head_node = node();
-        head_node->left = new_node;
-        new_node->left = add_goal_node();
+        head_node->right = new_node;
+        new_node->right = add_goal_node();
 
         self->nodes = head_node;
 
@@ -133,6 +133,21 @@ void free_nodes(Graph *self) {
     self->nodes = NULL;
     self->length_of_nodes = 0;
 
+    return;
+}
+
+void alternative_path(Graph *self) {
+    if (!self->nodes)
+        return;
+
+    Node *curr_node = self->nodes;
+    if (curr_node->right == NULL) {
+        curr_node->right = add_goal_node();
+    }
+
+    // while (curr_node->right->character != GOAL) {
+    //     curr_node = curr_node->right;
+    // }
     return;
 }
 

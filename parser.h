@@ -4,8 +4,8 @@
 
 #define MAX_ARRAY_LENGTH 8
 
-Graph* parse_regex(char *regex);
-void split(Graph *parser, char *regex);
+Graph* parse_regex(Graph* parser, char *regex);
+int split(Graph *parser, char *regex);
 void deconstruct(Graph *parser);
 
 // Not used, will need to change goal Node approach

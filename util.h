@@ -1,42 +1,31 @@
 #if !defined(UTILS)
 #define UTILS
 
-#define EMPTY 0
+#include <stdio.h>
+#include <stdlib.h>
+
 #define GOAL 1
-typedef struct Graph Graph;
+#define SPLIT 2
 typedef struct Node Node;
+typedef union Ptrlist Ptrlist;
+typedef struct Fragment Fragment;
 
 struct Node{
     int character;
     Node *left; // output
     Node *right; //output2
-    // int lastlist; Maybe
-
+    int lastlist;
 };
 
-struct Graph{
-    Node *nodes;
-    int length_of_nodes; // Counts number of nodes excluding goal node
-
-    void (*free_nodes)(Graph *);
-    void (*add_node_left)(Graph *, int character);
-    void (*add_node_right)(Graph *, int character);
-    void (*alternative_path)(Graph *);
-    void (*loop_to_start)(Graph *);
-    void (*loop_node)(Graph *);
+struct Fragment {
+    Node *start;
+    Ptrlist *out;
 };
+Fragment fragment(Node *start, Ptrlist *out);
 
-
-Node *node();
-Node *add_goal_node();
-
-Graph *graph();
-void add_node_left(Graph *self, int character);
-void add_node_right(Graph *self, int character);
-void free_node_repeat(Node *node);
-void free_nodes(Graph *self);
-void alternative_path(Graph *self);
-void loop_to_start(Graph *self);
-void loop_node(Graph *self);
+union Ptrlist {
+    Ptrlist *next;
+    Node *node;
+};
 
 #endif // UTILS

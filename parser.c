@@ -1,80 +1,57 @@
-#include <stdio.h>
-#include <stdlib.h>
 #include "parser.h"
 
 /// @brief Given a regular expression. Translate the expression into a readable form. (ex. [a-zA-Z]@gmail.com = heLLo@gmail.com)
+/// @param parser a Graph pointer to be filled with nodes from the regular expression
 /// @param regex an array of char (a string) containing the regular expression to be decoded
-Graph* parse_regex(Graph *parser, char *regex) {
-    if (!regex) {
-        return NULL;
+Node* post2nfa(char *postfix) {
+    char *p;
+    Fragment stack[1000], *stackp, e1, e2, e;
+    Node *n;
+
+    #define push(n) *stackp++ = n
+    #define pop()   *--stackp
+
+    stackp = stack;
+    for(p=postfix; *p; p++) {
+        switch(*p) {
+            case '.':
+                e2 = pop();
+                e1 = pop();
+                patch(e1.out, e2.start);
+                push(Fragment(e1.start, e2.out));
+                break;
+            case '|':
+                e2 = pop();
+                e1 = pop();
+                n = node(SPLIT, e1.start, e2.start);
+                push(Fragment(n, append(e1.out, e2.out)));
+                break;
+            case '?':
+                e = pop();
+                n = node(SPLIT, e.start, NULL);
+                push(Fragment(n, append(e.out, list1(&n->right))));
+                break;
+            case '*':
+                e = pop();
+                n = node(SPLIT, e.start, NULL);
+                patch(e.out, n);
+                push(Fragment(n, list1(&n->right)));
+                break;
+            case '+':
+                e = pop();
+                n = node(SPLIT, e.start, NULL);
+                patch(e.out, n);
+                push(Fragment(n, list1(&n->right)));
+                break;
+            default:
+                n = node(*p, NULL, NULL);;
+                push(Fragment(s, list1(&n->left)));
+                break;
+        }
     }
-    
-    if (!parser) {
-        parser = graph(); // can be 16 if needed 
-    }
-    char character;
-
-    do {
-        character = regex[0];
-
-        if (character == '.') {
-            ++regex;
-            continue;
-        }
-        else if (character == '|') {
-            int regex_index = split(parser, ++regex);
-            regex += regex_index;
-
-        }
-        else if (character == '?') {
-            // zero_or_none(parser, ++regex);
-            alternative_path(parser);
-        }
-        else if (character == '*') {
-            // zero_or_more(parser, ++regex);
-            loop_to_start(parser);
-            add_node_right(parser, (int)character);
-        }
-        else if (character == '+') {
-            // one_or_more(parser, ++regex);
-            loop_node(parser);
-        }
-        else {
-            add_node_left(parser, (int)character);
-        }
-
-        // // Collect capture groups
-        // if (character == '[') {
-
-        // }
-
-        ++regex;
-    } while (regex[0] != '\0');
-
-    // Create goal nodes when completed parsers
-    return parser;
-}
-
-int split(Graph *parser, char *regex) {
-    char character;
-    int regex_index = -1; // Since '|' is already removed
-
-    while (regex[0] != '\0') {
-        character = regex[0];
-        if (character == ']' || character == ')') {
-            break;
-        }
-        add_node_right(parser, (int)character);
-        ++regex;
-        ++regex_index;
-    }
-    return regex_index;
-}
-
-void deconstruct(Graph *parser) {
-    // for (int i = 0; i < MAX_ARRAY_LENGTH; i++) {
-    //     free_nodes(&parser[i]);
-    // }
-    free_nodes(parser);
-    return;
+    e = pop();
+    patch(e.out, matchstate);
+    return e.start;
+    #undef pop
+    #undef push
 }

@@ -16,4 +16,4 @@ regex_test:
 	gcc -Wall -o regex_test ${test} ${match} ${parser} ${util}
 
 clean:
-	rm -v regex
+	rm -v regex regex_test

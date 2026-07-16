@@ -59,6 +59,18 @@ int main() {
     run_test("Complex Email test - Correct", "[a-zA-Z0-9_]+@[a-zA-Z0-9]+[a-zA-Z]{2,}", "valid_@example.com");
     run_test("Complex Email test - Incorrect", "[a-zA-Z0-9_]+@[a-zA-Z0-9]+[a-zA-Z]{2,}", "invalidemail.@@gmail.com");
     run_test("Complex Email test - Correct", "[a-zA-Z0-9_]+@[a-zA-Z0-9]+[a-zA-Z]{2,}", "Edwei395@gmail.com");
+    run_test("Complex Email test - Correct", "[a-zA-Z0-9_]+@[a-zA-Z0-9]+[a-zA-Z]{2,}", "ewa70@gmail.ca");
+
+    run_test("Escaped char - Correct", "win\\?", "win?");
+    run_test("Escaped char - Incorrect", "win\\?", "win");
+
+    run_test("One-or-more - Correct", "ab+c", "abc");
+    run_test("One-or-more - Correct", "ab+c", "abbbc");
+    run_test("One-or-more - Incorrect", "ab+c", "ac");
+
+    run_test("Consecutive groups - Correct", "(ab)(cd)", "abcd");
+    run_test("Consecutive groups - Incorrect", "(ab)(cd)", "ab");
+    run_test("Consecutive groups - Incorrect", "(ab)(cd)", "cd");
 
     printf("\nAll regex parser tests complete.\n");
     return 0;
